@@ -1,0 +1,4 @@
+streamlit==0.89.0
+pandas
+numpy
+streamlit-drawable-canvas
