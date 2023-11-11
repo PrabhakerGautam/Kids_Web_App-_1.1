@@ -19,8 +19,8 @@ def about_section():
         "#### Feel free to provide feedback on the prediction accuracy in the text box below the prediction. Your input helps improve the model!"
     )
     st.markdown(
-        "[GitHub Repository](https://github.com/yourusername/your-repo) | "
-        "[Report an Issue](https://github.com/yourusername/your-repo/issues)"
+        "[GitHub Repository](https://github.com/PrabhakerGautam/Kids_Web_App-_1.1) | "
+        "[Report an Issue](https://github.com/PrabhakerGautam/Kids_Web_App-_1.1/issues)"
     )
     st.write("---")
 
