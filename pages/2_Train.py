@@ -3,9 +3,15 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
-from torchvision import datasets
+#from torchvision import datasets
 from PIL import Image
 import os
+from torch.utils.data import DataLoader, TensorDataset
+from sklearn.model_selection import train_test_split
+import time
+
+# Streamlit app
+st.set_page_config(page_title="2.Tain", layout='centered',page_icon='./images/brain.png')
 
 
           
@@ -68,63 +74,83 @@ model = SimpleCNN()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Streamlit app
-st.set_page_config(page_title="Kids' Digit Classifier", layout='centered',page_icon='./images/object.png')
 
-#st.title("Kids' Digit Classifier")
-
-#st.write("Welcome to the *Train* section, where the real magic happens! This is where your computer model learns from the dataset you created in the *Create Dataset* section. Just like a teacher instructs students, you'll guide your computer model to recognize your drawings. Watch as your model learns and gets smarter with each training session. It's like magic, but with computers! Ready to see your model grow? Let's begin the training adventure! 🚀🤖")
 
 st.markdown(""" 
             # **Let's Teach and Train Together!**
 
-🚀 Welcome to the "Train" section, where the real magic happens! Just like a teacher instructs students, here you'll guide your computer model to recognize your drawings. Your computer friend is like a clever robot, and you're the mentor.
+#### 🚀 Welcome to the "Train" section, where the real magic happens!
 
-🧠 **Watch It Learn**: As you train your model, it gets smarter with every lesson. Imagine your computer buddy growing wiser with each session. It's like having a digital pet that's eager to learn from you.
 
-📚 **Your Art, Its Knowledge**: Remember those colorful numbers you drew in the "Create Dataset" section? They become the lessons your model studies. It's like sharing your creations with a digital friend.
+**Your computer friend is like a clever robot, and you're the mentor**.
 
-🌟 **Magical Progress**: Watch as your computer model transforms. It's like magic, but it's really the power of your creativity and your computer working together.
-  
- 🤖 **epoch** is like a special round of practice for your computer friend. It's when your friend looks at all the drawings you've made and learns from them. Think of it as one big step in training your computer to be super smart!" 📚🚀
+**More epochs mean more learning for our model. It's like giving it more time to become super smart! 🚀🧠 You can adjust the number of epochs on the sidebar.** 
 
-Are you ready to teach your computer friend some tricks? Let's embark on the training adventure and see your model grow before your eyes! 🎩📝🤖
+**So, feel free to try different numbers of epochs and see the magic happen in our learning adventure! ✨📚**
+
+
+###### Let's embark on the training adventure and see your model grow before your eyes! 🎩📝🤖
 
             
             """)
 
-# User input for the number of epochs
-num_epochs = st.sidebar.number_input("Number of Epochs:", min_value=1, value=5, step=1)
+# Split the dataset into training and validation sets
+train_images, val_images, train_labels, val_labels = train_test_split(images, labels, test_size=0.2, random_state=42)
 
+# User input for the number of epochs
+num_epochs = st.sidebar.number_input("Number of epochs:", min_value=1, value=10, step=1)
+
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# Train the model
+train_dataset = TensorDataset(train_images, train_labels)
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+
+val_dataset = TensorDataset(val_images, val_labels)
+val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
 if st.button("**Train Model**"):
     st.info("Training the model...")
 
     # Define your training dataset and data loader
-    train_dataset = torch.utils.data.TensorDataset(images, labels)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-
-    # Train the model
+    
     for epoch in range(num_epochs):
-        with st.empty():
-            progress_text = st.empty()
+        model.train()
+        for images, labels in train_loader:
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            # Validation loop
+            model.eval()
+            val_loss = 0.0
+            correct = 0
+            total = 0
+        with torch.no_grad():
+            for images, labels in val_loader:
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+                val_loss += loss.item()
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+            val_loss /= len(val_loader)
+            accuracy = correct / total
             progress_bar = st.progress(0)
+            for percent_complete in range(0, 101, 10):
+                progress_bar.progress(percent_complete)
+                time.sleep(0.2) 
+            st.info(f'Epoch {epoch+1}/{num_epochs}, Loss: {val_loss:.4f}, Accuracy: {accuracy*100:.2f}%')
+    if accuracy<50:
+        st.warning("Draw, teach, and boost accuracy above 50%. Your art makes your computer friend smarter!")
+    st.success("Trained model saved ")
+    st.write("#### Next Step, Model Testing")
+    st.markdown("[Click here to begin the Testing process](/Test/)")
+#saving the model
+model_folder = "models"
+os.makedirs(model_folder, exist_ok=True)
+model_path = os.path.join(model_folder, "trained_model.pth")
+torch.save(model.state_dict(), model_path)
 
-            progress_text.text(f"Training Epoch {epoch + 1}")
-
-            for i, (image_batch, label_batch) in enumerate(train_loader):
-                # Zero the gradients
-                optimizer.zero_grad()
-
-                # Forward pass
-                outputs = model(image_batch)
-                loss = criterion(outputs, label_batch)
-
-                # Backpropagation and optimization
-                loss.backward()
-                optimizer.step()
-
-                # Update the progress bar
-                progress = (i + 1) / len(train_loader)
-                progress_bar.progress(progress)
-
-            st.success(f"Training complete for Epoch {epoch + 1}")

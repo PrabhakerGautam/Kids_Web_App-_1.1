@@ -1,25 +1,30 @@
-import streamlit as st 
+# streamlit_app.py
+import streamlit as st
+import os
+from PIL import Image
+from streamlit_drawable_canvas import st_canvas
 
-st.set_page_config(page_title="Home",
+st.set_page_config(page_title="About",
                    layout='wide',
-                   page_icon='./images/object.png')
+                   page_icon='./images/about.png')
+def about_section():
+    st.subheader("About the App")
+    st.write(
+        "#### Welcome to the **AI Doodle Recognizer**! 🎨✨ "
+        "\n\n"
+        "#### This app allows you to draw a digit, and the AI model will predict what digit you've drawn."
+        "\n\n"
+        "#### You can use the drawing canvas to create your digit masterpiece. After drawing, click the **Predict** button to see the model's prediction."
+        "\n\n"
+        "#### Feel free to provide feedback on the prediction accuracy in the text box below the prediction. Your input helps improve the model!"
+    )
+    st.markdown(
+        "[GitHub Repository](https://github.com/yourusername/your-repo) | "
+        "[Report an Issue](https://github.com/yourusername/your-repo/issues)"
+    )
+    st.write("---")
 
-#st.title("DigiDraw: Kids' Magical Number Adventure")
-#st.caption('This web application demostrate how kids can  create a model and train it using custom data')
 
-# Content
-st.markdown("""
-  # **Discover the Digital Magic!**
 
-🔍 Ever wondered how your computer friend works its digital magic? In the "About" section, you'll uncover the secrets behind the scenes.
-
-🧙‍♂️ **Meet the Code Wizards**: Get to know the code wizards who brought your digital buddy to life. They're like modern-day magicians who make the impossible possible.
-
-🔬 **Inside the Virtual Brain**: Explore the virtual brain of your computer model. It's like a treasure chest filled with the power to understand your drawings.
-
-🚀 **Ready to Learn Together**: Discover cool facts about the world of technology and see how you and your computer friend are a team on an amazing learning adventure.
-
-Get ready to become a digital explorer in the "About" section. Let's embark on a journey of curiosity and wonder! 🌌📡🎩
-
-           
-            """)
+# Include this function call at the beginning of your app
+about_section()
