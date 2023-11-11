@@ -147,7 +147,7 @@ if st.button("**Train Model**"):
         st.warning("Draw, teach, and boost accuracy above 50%. Your art makes your computer friend smarter!")
     st.success("Trained model saved ")
     st.write("#### Next Step, Model Testing")
-    st.markdown("[Click here to begin the Testing process](/Test/)")
+    st.markdown("[Click here to begin the Testing process](/Predict/)")
 #saving the model
 model_folder = "models"
 os.makedirs(model_folder, exist_ok=True)
